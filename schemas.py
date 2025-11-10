@@ -8,41 +8,32 @@ Each Pydantic model represents a collection in your database.
 Model name is converted to lowercase for the collection name:
 - User -> "user" collection
 - Product -> "product" collection
-- BlogPost -> "blogs" collection
+- BlogPost -> "blogpost" collection
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, EmailStr
+from typing import Optional, List
 
-# Example schemas (replace with your own):
 
-class User(BaseModel):
+class Contactsubmission(BaseModel):
     """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
+    Contact form submissions
+    Collection name: "contactsubmission"
     """
-    name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
+    name: str = Field(..., description="Sender full name", min_length=2)
+    email: EmailStr = Field(..., description="Sender email")
+    message: str = Field(..., description="Message body", min_length=5, max_length=5000)
+    source: Optional[str] = Field(None, description="Source page or referrer")
 
-class Product(BaseModel):
+
+class Blogpost(BaseModel):
     """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
+    Blog posts schema
+    Collection name: "blogpost"
     """
-    title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
-
-# Add your own schemas here:
-# --------------------------------------------------
-
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+    title: str
+    slug: str
+    excerpt: Optional[str] = None
+    content: Optional[str] = None
+    tags: Optional[List[str]] = None
+    published: bool = True
